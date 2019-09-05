@@ -7,7 +7,8 @@
     "test": "mocha",
     "prestart": "node scripts/prestart",
     "start": "node index.js",
-    "build": "babel --presets @babel/preset-react app/public/js -d app/public/compiled-js"
+    "build": "babel --presets @babel/preset-react app/public/js -d app/public/compiled-js",
+    "make_db": "node scripts/make_db"
   },
   "author": "Nafaya",
   "license": "ISC",
