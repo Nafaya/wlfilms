@@ -13,6 +13,9 @@ describe('DB', function() {
     Sequelize.useCLS(namespace) ;
     var sequelize = new Sequelize(config.database.database, config.database.username, config.database.password, config.database.options);
     sequelize.import('../app/dbmodels') ;
+    after(function(){
+        sequelize.close(true) ;
+    }) ;
     it('should have a Film model', function() {
         assert.exists(sequelize.models.Film);
     });
