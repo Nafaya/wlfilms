@@ -3,14 +3,14 @@
 	},
 	"development":{
 		"winston": {
-			"velel":"debug"
+			"level":"debug"
 		}
 	},
 	"testing":{
 	},
 	"defaults":{
 		"winston": {
-			"velel":"info"
+			"level":"info"
 		}
 	}
 }

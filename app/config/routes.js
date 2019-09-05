@@ -23,6 +23,6 @@ module.exports = function (app, config, sequelize) {
 
 	app.use(function(err, req, res, next) {
 	    console.log(err) ;
-        return res.jsend.error(err);
+        return res.status(400).jsend.error(err);
 	});
 };

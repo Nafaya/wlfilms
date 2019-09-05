@@ -7,30 +7,30 @@ function FilmController(sequelize){
 FilmController.prototype.get = function(req,res,next){
     console.log('get') ;
     return this.filmModel.get(req.params['id']).then(function(dbfilm){
-        return res.jsend.success(DBView.dbFilmToOutput(dbfilm));
+        return res.status(200).jsend.success(DBView.dbFilmToOutput(dbfilm));
     },next)
 } ;
 FilmController.prototype.getAll = function(req,res,next){
     console.log('getAll') ;
     return this.filmModel.get(req.query).then(function(dbfilms){
-        return res.jsend.success(DBView.dbFilmsToOutput(dbfilms));
+        return res.status(200).jsend.success(DBView.dbFilmsToOutput(dbfilms));
     },next)
 } ;
 FilmController.prototype.delete = function(req,res,next){
     console.log('delete') ;
     return this.filmModel.delete(req.params['id']).then(function(dbfilm){
-        return res.jsend.success(DBView.dbFilmToOutput(dbfilm));
+        return res.status(200).jsend.success(DBView.dbFilmToOutput(dbfilm));
     },next)
 } ;
 FilmController.prototype.add = function(req,res,next){
     console.log('add') ;
     if(req.files && req.files.films){
         return this.filmModel.addFromFile(req.files.films).then(function(dbfilms){
-            return res.jsend.success(DBView.dbFilmsToOutput(dbfilms));
+            return res.status(201).jsend.success(DBView.dbFilmsToOutput(dbfilms));
         })
     }
     return this.filmModel.add(req.body).then(function(dbfilm){
-        return res.jsend.success(DBView.dbFilmToOutput(dbfilm));
+        return res.status(201).jsend.success(DBView.dbFilmToOutput(dbfilm));
     },next)
 } ;
 FilmController.prototype.editOrCreate = function(req,res,next){

@@ -32,6 +32,8 @@ export NODE_ENV=testing&&npm test
 ```
 
 #Архитектура
+
+##Файлы
 index.js                        - стартовая точка приложения
 app/                            - папка проекта
 app/config/                     - конфиги проекта
@@ -43,8 +45,18 @@ app/config/routes.js            - настройка марщрутов для e
 app/config/index.js             - хелпер для загрузки конфигов
 
 app/controllers                 - контроллеры.
+
 app/dbmodels                    - орм-модели БД.
-app/models                      - модели
+
+app/models                          - модели
+
+app/public                          - public
+app/public/index.html               - точка входа клиента
+app/public/index.production.html    - точка входа клиента для production
+app/public/css                      - css
+app/public/js                       - js для development
+app/public/compiled-js              - css для production
+
 app/views                       - views
 app/views/db_view.js            - хелпер для форматирования моделей из БД перед отправкой пользователю
 
@@ -60,6 +72,131 @@ scripts/prestart.js             - скрипт перед запуском пр�
 
 /test                           - тестовые скрипты
 
+
+##Маршруты
+GET /                           - точка входа в приложение
+GET /static/css                 - css files
+GET /static/js                  - js files
+
+GET /films/:id                  - информация про фильм с указаным айди
+Answer:
+    Success:
+```js
+        {
+            status:'success',
+            data:{
+                name:FILM_NAME,
+                format:FILM_FORMAT,
+                realized_at:FILM_REALIZED_AT,
+                actors:[ACTOR, ACTOR,....]
+            }
+        }
+```
+        
+GET /films                       - загрузить список фильмов
+GET-params:
+    query           - строка поиска
+    queryTatrget    - 'name'|'actors'. Ищет вхождение среди акутеров или имен фильмов.
+Answer:
+    Success:
+```js
+        {
+            status:'success',
+            data:[
+            {
+                name:FILM_NAME,
+                format:FILM_FORMAT,
+                realized_at:FILM_REALIZED_AT,
+                actors:[ACTOR, ACTOR,....]
+            }
+            ,...]
+        }
+```
+
+POST /films                       - добавить фильмы в БД
+POST-params:
+    *name            - название фильма
+    *format          - формат
+    *actors          - актеры через запятую
+    *realized_at     - год выпуска
+Answer:
+    Success: вернет информацию об созданом обьекте
+```js
+        {
+            status:'success',
+            data:{
+                 name:FILM_NAME,
+                 format:FILM_FORMAT,
+                 realized_at:FILM_REALIZED_AT,
+                 actors:[ACTOR, ACTOR,....]
+             }
+        }
+```
+
+POST /films                       - добавить фильмы в БД
+POST-params:
+    *films            - файл с фильмамы
+Answer:
+    Success: вернет информацию об успешно созданых обьектах
+```js
+        {
+            status:'success',
+            data:[{
+                 name:FILM_NAME,
+                 format:FILM_FORMAT,
+                 realized_at:FILM_REALIZED_AT,
+                 actors:[ACTOR, ACTOR,....]
+             }
+             ,...]
+        }
+```
+
+PUT /films/:id                 - изменить информацию о фильме
+PUT-params:
+    name            - название фильма
+    format          - формат
+    actors          - актеры через запятую
+    realized_at     - год выпуска
+Answer:
+    Success: вернет новую информацию об обьекте
+```js
+        {
+            status:'success',
+            data:{
+                 name:FILM_NAME,
+                 format:FILM_FORMAT,
+                 realized_at:FILM_REALIZED_AT,
+                 actors:[ACTOR, ACTOR,....]
+             }
+        }
+```
+
+DELETE /films/:id               - удаляет фильм из БД
+Answer:
+    Success: вернет информацию об удаленном обьекте обьекте
+```js
+        {
+            status:'success',
+            data:{
+                 name:FILM_NAME,
+                 format:FILM_FORMAT,
+                 realized_at:FILM_REALIZED_AT,
+                 actors:[ACTOR, ACTOR,....]
+             }
+        }
+```
+
+При неуспешном запросе ответ будет:
+```js
+        {
+            status:'error',
+            message:MESSAGE
+        }
+```
+
+
+
+        
 #Тесты
 
 ```bash

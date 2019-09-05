@@ -1,4 +1,4 @@
-//loading libraries
+//load libraries
 const path        = require('path') ;
 const express     = require('express') ;
 const _     = require('underscore') ;
@@ -6,6 +6,7 @@ const winston     = require('winston') ;
 var environment = require('./app/config/environment') ;
 var routes      = require('./app/config/routes') ;
 
+//load config files
 process.env.NODE_ENV = process.env.NODE_ENV || 'development' ;
 console.log("Environment: "+process.env.NODE_ENV) ;
 const config = {
@@ -15,8 +16,7 @@ const config = {
     database:require('./app/config')('database')
 } ;
 
-
-var Winston = require("winston") ;
+/*var Winston = require("winston") ;
 const logger = winston.createLogger({
     level: config.app.winston.level||'info',
     transports: [
@@ -47,8 +47,7 @@ if (process.env.NODE_ENV !== 'production') {
         colorize: true,
         format: winston.format.simple()
     }));
-}
-
+}*/
 
 var cls = require('continuation-local-storage'),
     namespace = cls.createNamespace('nafaya-namespace');
