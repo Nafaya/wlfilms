@@ -1,0 +1,14 @@
+{
+	"production":{
+		"port":"80"
+	},
+	"development":{
+		"port":"3000"
+	},
+	"testing":{
+		"port":"3000"
+	},
+	"defaults":{
+		"port":"3000"
+	}
+}

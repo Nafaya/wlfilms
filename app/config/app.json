@@ -1,0 +1,16 @@
+{
+	"production":{
+	},
+	"development":{
+		"winston": {
+			"velel":"debug"
+		}
+	},
+	"testing":{
+	},
+	"defaults":{
+		"winston": {
+			"velel":"info"
+		}
+	}
+}
