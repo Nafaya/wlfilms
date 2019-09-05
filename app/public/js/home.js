@@ -108,7 +108,7 @@ class Home extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col" style={{width:'18rem', display:'inline-block'}}><FilmInfo onMessage={this.handleMassage} onUpdatedFilm={this.handleUpdatedFilm} film={this.state.selected_film} /></div>
-                    <div className="col" style={{display:'inline-block','min-width':'rem'}}><TableFilms onMessage={this.handleMassage} query={this.state.query} queryTarget={this.state.queryTarget} onFilter={this.handleFilter} onSelectFilm={this.handleSelectFilm} selected_film={this.state.selected_film} films={this.state.films}/></div>
+                    <div className="col" style={{display:'inline-block','minWidth':'30rem'}}><TableFilms onMessage={this.handleMassage} query={this.state.query} queryTarget={this.state.queryTarget} onFilter={this.handleFilter} onSelectFilm={this.handleSelectFilm} selected_film={this.state.selected_film} films={this.state.films}/></div>
                     <div className="col" style={{width:'18rem', display:'inline-block'}}><FilmLoader onMessage={this.handleMassage} onAddedFilm={this.handleAddedFilm} /></div>
                 </div>
             </div>
@@ -249,7 +249,7 @@ class TableFilms extends React.Component {
         const films = this.props.films.map((film,step   ) => {
             return (
                 <div style={{width:'100%'}} key={film.id}>
-                    <button className={["btn",(this.props.selected_film && film.id===this.props.selected_film.id)?'btn-default':'btn-link'].join(' ')} style={{'white-space': 'normal','word-wrap': 'normal',width:'100%'}} onClick={() => this.handleSelectFilm(film,step)}>{film.name}({film.realized_at})</button>
+                    <button className={["btn",(this.props.selected_film && film.id===this.props.selected_film.id)?'btn-default':'btn-link'].join(' ')} style={{'whiteSpace': 'normal','wordWrap': 'normal',width:'100%'}} onClick={() => this.handleSelectFilm(film,step)}>{film.name}({film.realized_at})</button>
                 </div>
             );
         });

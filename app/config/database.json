@@ -21,8 +21,7 @@
 			"dialectOptions": {
 				"supportBigNumbers": true,
 				"bigNumberStrings": true
-			},
-			"operatorsAliases":true
+			}
 		}
 	}
 }
