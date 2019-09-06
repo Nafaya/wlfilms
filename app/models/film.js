@@ -99,7 +99,7 @@ FilmModel.prototype.editOrCreate = function(id,_filmData){
     var Film = sequelize.models.Film ;
     var filmData = _.pick(_filmData,['name','realized_at','format','actors']) ;
     return Promise.resolve().then(function(){
-        this.checkFilmInfo(filmData, true) ;
+        self.checkFilmInfo(filmData, true) ;
     }).then(function(){
         return Film.findByPk(id) ;
     }).then(function(dbfilm){

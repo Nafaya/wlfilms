@@ -6,6 +6,19 @@ const AppNav = () => (
    </nav>
 );
 
+function ApiAjax(obj){
+    return $.ajax(obj).then(function( result, textStatus, jqXHR ) {
+        if(!result) throw new Error('Bad response.') ;
+        if(result.status==='success') return result.data ;
+        if(!result.message) throw new Error('Bad response.') ;
+        throw new Error(result.message) ;
+    },function( jqXHR, textStatus, errorThrown  ) {
+        if(!jqXHR.responseJSON) throw new Error('Bad response.') ;
+        var result = jqXHR.responseJSON ;
+        if(!result.message) throw new Error('Bad response.') ;
+        throw new Error(result.message) ;
+    })
+}
 class FilmHelper extends React.Component{
     constructor(props) {
         super(props);
@@ -87,17 +100,11 @@ class Home extends React.Component {
             data.query = query;
             data.queryTarget = queryTarget ;
         }
-        $.ajax({
+        ApiAjax({
             method: 'GET',
             type: 'GET',
             url: '/films',
             data:data
-        }).then(function( result, textStatus, jqXHR ) {
-            if(result.status==='success'){
-                return result.data ;
-            } else {
-                throw new Error(result.message) ;
-            }
         }).then(function( films ) {
             self.setState({films:films,selected_film:films.find(function(film){return self.state.selected_film && film.id===self.state.selected_film.id}),query:query,queryTarget:queryTarget   })
         }, function (err) {
@@ -146,17 +153,11 @@ class FilmInfo extends FilmHelper {
             format:this._input_format.value,
             actors:this._input_actors.value,
         } ;
-        $.ajax({
+        ApiAjax({
             method: 'PUT',
             type: 'PUT',
             url: '/films/'+this.props.film.id,
             data: data
-        }).then(function( result, textStatus, jqXHR ) {
-            if(result.status==='success'){
-                return result.data ;
-            } else {
-                throw new Error(result.message) ;
-            }
         }).then(function( data ) {
             console.log(data) ;
             self.setState({changable:false})
@@ -170,16 +171,10 @@ class FilmInfo extends FilmHelper {
     }
     handleDeleteButtonClick(){
         var self =  this ;
-        $.ajax({
+        ApiAjax({
             method: 'DELETE',
             type: 'DELETE',
             url: '/films/'+this.props.film.id
-        }).then(function( result, textStatus, jqXHR ) {
-            if(result.status==='success'){
-                return result.data ;
-            } else {
-                throw new Error(result.message) ;
-            }
         }).then(function( data ) {
             console.log(data) ;
             self.setState({changable:false})
@@ -188,7 +183,9 @@ class FilmInfo extends FilmHelper {
             console.log('error') ;
             self.props.onMessage(err.message) ;
             console.log(err.message) ;
-        });
+        }).then(()=>{
+            $(this._delete_modal).modal('hide') ;
+        })
     }
     render() {
         if(this.state.film){
@@ -202,36 +199,22 @@ class FilmInfo extends FilmHelper {
                     <div className="card-body">
                         <h5 className="">Add a new:</h5>
                         <h6 className="">Name:</h6>
-                        <input name="name" type="text" onChange={()=>{var film = this.state.film;film.name = this._input_name.value;this.setState({film:film})}} ref={(el)=>{this._input_name=el;}} value={(this.state.film)?this.state.film.name:''} />
+                        <input className="form-control" name="name" type="text" onChange={()=>{var film = this.state.film;film.name = this._input_name.value;this.setState({film:film})}} ref={(el)=>{this._input_name=el;}} value={(this.state.film)?this.state.film.name:''} />
                         <h6 className="">Realized at:</h6>
-                        <input name="realized_at" type="text" onChange={()=>{var film = this.state.film;film.realized_at = this._input_realized_at.value;this.setState({film:film})}} ref={(el)=>{this._input_realized_at=el;}} value={(this.state.film)?this.state.film.realized_at:''} placeholder="Year"/>
+                        <input className="form-control" name="realized_at" type="text" onChange={()=>{var film = this.state.film;film.realized_at = this._input_realized_at.value;this.setState({film:film})}} ref={(el)=>{this._input_realized_at=el;}} value={(this.state.film)?this.state.film.realized_at:''} placeholder="Year"/>
                         <h6 className="">Format:</h6>
-                        <input name="format" type="text" onChange={()=>{var film = this.state.film;film.format = this._input_format.value;this.setState({film:film})}} ref={(el)=>{this._input_format=el;}} value={(this.state.film)?this.state.film.format:''} />
+                        <select name="format" className="form-control" onChange={()=>{var film = this.state.film;film.format = this._input_format.value;this.setState({film:film})}} ref={(el)=>{this._input_format=el;}} value={(this.state.film)?this.state.film.format:''}>
+                            <option value="DVD">DVD</option>
+                            <option value="Blu-Ray">Blu-Ray</option>
+                            <option value="VHS">VHS</option>
+                        </select>
                         <h6 className="">Actors</h6>
-                        <textarea name="actors" onChange={()=>{var film = this.state.film;film.actors = this._input_actors.value;this.setState({film:film})}} ref={(el)=>{this._input_actors=el;}} value={(this.state.film)?this.state.film.actors:''} type="textarea" placeholder="Actors" />
-                        <button className="" data-toggle="modal" data-target="#exampleModalLong" onClick={()=>this.handleSaveButtonClick()}>save</button>
-                    </div>
-                    <button type="button" class="btn btn-primary">
-                        Launch demo modal
-                    </button>
+                        <textarea className="form-control" name="actors" onChange={()=>{var film = this.state.film;film.actors = this._input_actors.value;this.setState({film:film})}} ref={(el)=>{this._input_actors=el;}} value={(this.state.film)?this.state.film.actors:''} type="textarea" placeholder="Actors" />
 
-                    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    ...
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                </div>
-                            </div>
+
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={()=>this.handleSaveButtonClick()}>save</button>
+                            <button className="btn btn-secondary" onClick={()=>$(this._delete_modal).modal('show')}>delete</button>
                         </div>
                     </div>
                 </div>
@@ -248,8 +231,26 @@ class FilmInfo extends FilmHelper {
                         <p className="">{(this.props.film)?this.props.film.format:''}</p>
                         <h6 className="">Actors</h6>
                         <p className="">{(this.props.film)?this.props.film.actors.join(', '):''}</p>
-                        <button className="card-link" onClick={()=>this.handleChangeButtonClick()}>change</button>
-                        <button onClick={()=>this.handleDeleteButtonClick()} className="card-link">delete</button>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={()=>this.handleChangeButtonClick()}>change</button>
+                            <button className="btn btn-secondary" onClick={()=>$(this._delete_modal).modal('show')}>delete</button>
+                        </div>
+                    </div>
+                    <div className="modal fade" ref={(el)=>{this._delete_modal=el;}} tabIndex="-1" role="dialog" aria-hidden="true">
+                        <div className="modal-dialog" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Delete film {(this.props.film)?(this.props.film.name+'('+this.props.film.realized_at+')'):''}.</h5>
+                                </div>
+                                <div className="modal-body">
+                                    Are you sure?
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" className="btn btn-primary" onClick={()=>this.handleDeleteButtonClick()}>Delete</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
@@ -282,16 +283,21 @@ class TableFilms extends React.Component {
                 </div>
             );
         });
+        var no_films = (
+            <div class="text-center"><h6>No such films.</h6></div>
+        ) ;
         return (
             <div className="card">
                 <div className="card-body">
                     <h5 className="">Film table</h5>
-                    <input type="text" onChange={this.handleChange} ref={(el)=>this._input_query=el}  defaultValue={this.props.query}/>
-                    <select name="where" onChange={this.handleChange} ref={(el)=>this._select_query_target=el} defaultValue={this.props.queryTarget}>
-                        <option value="name">name</option>
-                        <option value="actors">actors</option>
-                    </select>
-                    <div>{films}</div>
+                    <div className="input-group">
+                        <input className="form-control" style={{width:'max-content'}} type="text" onChange={this.handleChange} ref={(el)=>this._input_query=el} placeholder={(this._select_query_target && this._select_query_target.value)||'name'} defaultValue={this.props.query}/>
+                        <select className="custom-select" name="where" onChange={this.handleChange} ref={(el)=>this._select_query_target=el} defaultValue={this.props.queryTarget}>
+                            <option value="name">name</option>
+                            <option value="actors">actors</option>
+                        </select>
+                    </div>
+                    <div>{(this.props.films.length)?films:no_films}</div>
                 </div>
             </div>
         );
@@ -310,21 +316,11 @@ class FilmLoader extends FilmHelper{
             format:this._input_format.value,
             actors:this._input_actors.value,
         } ;
-        $.ajax({
+        ApiAjax({
             method: 'POST',
             type: 'POST',
             url: '/films',
             data: data
-        }).then(function( result, textStatus, jqXHR ) {
-            if(!result) throw new Error('Bad response.') ;
-            if(result.status==='success') return result.data ;
-            if(!result.message) throw new Error('Bad response.') ;
-            throw new Error(result.message) ;
-        },function( jqXHR, textStatus, errorThrown  ) {
-            if(!jqXHR.responseJSON) throw new Error('Bad response.') ;
-            var result = jqXHR.responseJSON ;
-            if(!result.message) throw new Error('Bad response.') ;
-            throw new Error(result.message) ;
         }).then(function( data ) {
             console.log(data) ;
             self._input_name.value = '' ;
@@ -385,17 +381,22 @@ class FilmLoader extends FilmHelper{
                 <div className="card-body">
                     <h5 className="">Add a new:</h5>
                     <h6 className="">Name:</h6>
-                    <input name="name" type="text" ref={(el)=>{this._input_name=el;}} />
+                    <input className="form-control" name="name" type="text" placeholder="Name" ref={(el)=>{this._input_name=el;}} />
                     <h6 className="">Realized at:</h6>
-                    <input name="realized_at" type="text" ref={(el)=>{this._input_realized_at=el;}} placeholder="Year"/>
+                    <input className="form-control" name="realized_at" type="text" ref={(el)=>{this._input_realized_at=el;}} placeholder="Year"/>
                     <h6 className="">Format:</h6>
-                    <input name="format" type="text" ref={(el)=>{this._input_format=el;}} />
+                    <select name="format" className="form-control" ref={(el)=>{this._input_format=el;}}>
+                        <option value="DVD">DVD</option>
+                        <option value="Blu-Ray">Blu-Ray</option>
+                        <option value="VHS">VHS</option>
+                    </select>
                     <h6 className="">Actors</h6>
-                    <textarea name="actors" ref={(el)=>{this._input_actors=el;}} type="textarea" placeholder="Actors"></textarea>
-                    <button className="" onClick={()=>this.handleSendManualForm()}>save</button>
+                    <textarea className="form-control" name="actors" ref={(el)=>{this._input_actors=el;}} type="textarea" placeholder="Actors"></textarea>
+                    <br />
+                    <button className="btn btn-secondary" onClick={()=>this.handleSendManualForm()}>save</button><br /><br />
                     <h5 className="card-title">Load a file:</h5>
-                    <input type="file" name="films" ref={(el)=>{this._input_file=el;}} />
-                    <button className="" onClick={()=>this.handleSendFileForm()}>Send</button>
+                    <input type="file" className="form-control"  name="films" ref={(el)=>{this._input_file=el;}} />
+                    <button className="btn btn-secondary" onClick={()=>this.handleSendFileForm()}>Send</button>
                 </div>
             </div>
         );
