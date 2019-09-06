@@ -11,7 +11,7 @@
  Target Server Version : 80015
  File Encoding         : 65001
 
- Date: 06/09/2019 15:31:03
+ Date: 06/09/2019 20:59:09
 */
 
 SET NAMES utf8mb4;
@@ -27,7 +27,8 @@ CREATE TABLE `wlfilms`  (
   `realized_at` int(4) NOT NULL,
   `format` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `actors` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uniq`(`name`, `realized_at`, `format`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 79 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
