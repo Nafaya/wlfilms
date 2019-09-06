@@ -61,7 +61,7 @@ FilmModel.prototype.add = function(data){
     })
 } ;
 FilmModel.prototype.checkFilmInfo = function(film, updating=false){
-    var keys = _.keys(film) ;
+    let keys = _.keys(film) ;
     if(!updating||film.hasOwnProperty('name')){
         if(!film.name)
             throw new Error('Fill the name.') ;
@@ -69,8 +69,12 @@ FilmModel.prototype.checkFilmInfo = function(film, updating=false){
     if(!updating||film.hasOwnProperty('realized_at')){
         if(!film.realized_at)
             throw new Error('Fill the realized_at field.') ;
-        if(isNaN(parseInt(film.realized_at)))
+        let year = parseInt(film.realized_at) ;
+        if(isNaN(year))
             throw new Error('Realized at field must be a year number.') ;
+        let currentYear = (new Date()).getFullYear()+1 ;
+        if(year<1850||year>currentYear)
+            throw new Error('Realized at field must be between 1850 and '+currentYear+'.') ;
     }
     if(!updating||film.hasOwnProperty('format')){
         if(!film.format)
@@ -79,7 +83,7 @@ FilmModel.prototype.checkFilmInfo = function(film, updating=false){
     if(!updating||film.hasOwnProperty('actors')) {
         if (!film.actors) {
             throw new Error('Fill the actors field.');
-            var actors = film.actors.split(/[\n,]/).map((str) => {
+            let actors = film.actors.split(/[\n,]/).map((str) => {
                 str = str.trim();
                 if (!str) throw new Error('Wrong actors format.');
                 return str;
@@ -87,15 +91,18 @@ FilmModel.prototype.checkFilmInfo = function(film, updating=false){
             film.actors = actors.join(', ');
         }
     }
-    return ;
+    return true;
 } ;
 FilmModel.prototype.editOrCreate = function(id,_filmData){
     var self = this ;
     var sequelize = self.sequelize ;
     var Film = sequelize.models.Film ;
     var filmData = _.pick(_filmData,['name','realized_at','format','actors']) ;
-    this.checkFilmInfo(filmData, true) ;
-    return Film.findByPk(id).then(function(dbfilm){
+    return Promise.resolve().then(function(){
+        this.checkFilmInfo(filmData, true) ;
+    }).then(function(){
+        return Film.findByPk(id) ;
+    }).then(function(dbfilm){
         if(!dbfilm) throw new Error('No such film.') ;
         return dbfilm.update(filmData) ;
     })

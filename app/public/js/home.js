@@ -19,8 +19,14 @@ class FilmHelper extends React.Component{
             this.props.onMessage('Fill the realized_at field.') ;
             return false ;
         }
-        if(isNaN(parseInt(this._input_realized_at.value))){
+        let year = parseInt(this._input_realized_at.value) ;
+        if(isNaN(year)){
             this.props.onMessage('Realized at field must be a year number.') ;
+            return false ;
+        }
+        let currentYear = (new Date()).getFullYear()+1 ;
+        if(year<1850||year>currentYear){
+            this.props.onMessage('Realized at field must be between 1850 and '+currentYear+'.') ;
             return false ;
         }
         if(!this._input_format.value){
@@ -203,7 +209,30 @@ class FilmInfo extends FilmHelper {
                         <input name="format" type="text" onChange={()=>{var film = this.state.film;film.format = this._input_format.value;this.setState({film:film})}} ref={(el)=>{this._input_format=el;}} value={(this.state.film)?this.state.film.format:''} />
                         <h6 className="">Actors</h6>
                         <textarea name="actors" onChange={()=>{var film = this.state.film;film.actors = this._input_actors.value;this.setState({film:film})}} ref={(el)=>{this._input_actors=el;}} value={(this.state.film)?this.state.film.actors:''} type="textarea" placeholder="Actors" />
-                        <button className="" onClick={()=>this.handleSaveButtonClick()}>save</button>
+                        <button className="" data-toggle="modal" data-target="#exampleModalLong" onClick={()=>this.handleSaveButtonClick()}>save</button>
+                    </div>
+                    <button type="button" class="btn btn-primary">
+                        Launch demo modal
+                    </button>
+
+                    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    ...
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
@@ -272,30 +301,6 @@ class FilmLoader extends FilmHelper{
     constructor(props) {
         super(props);
     }
-    checkAllFields(film){
-        if(!this._input_name.value){
-            this.props.onMessage('Fill the name.') ;
-            return false ;
-        }
-        if(!this._input_realized_at.value){
-            this.props.onMessage('Fill the realized_at field.') ;
-            return false ;
-        }
-        if(isNaN(parseInt(this._input_realized_at.value))){
-            this.props.onMessage('Realized at field must be a year number.') ;
-            return false ;
-        }
-        if(!this._input_format.value){
-            this.props.onMessage('Fill the format field.') ;
-            return false ;
-        }
-        if(!this._input_actors.value){
-            this.props.onMessage('Fill the actors field.') ;
-            return false ;
-        }
-        this.props.onMessage('') ;
-        return true ;
-    }
     handleSendManualForm(){
         if(!this.checkAllFields()) return ;
         var self =  this ;
@@ -311,11 +316,15 @@ class FilmLoader extends FilmHelper{
             url: '/films',
             data: data
         }).then(function( result, textStatus, jqXHR ) {
-            if(result.status==='success'){
-                return result.data ;
-            } else {
-                throw new Error(result.message) ;
-            }
+            if(!result) throw new Error('Bad response.') ;
+            if(result.status==='success') return result.data ;
+            if(!result.message) throw new Error('Bad response.') ;
+            throw new Error(result.message) ;
+        },function( jqXHR, textStatus, errorThrown  ) {
+            if(!jqXHR.responseJSON) throw new Error('Bad response.') ;
+            var result = jqXHR.responseJSON ;
+            if(!result.message) throw new Error('Bad response.') ;
+            throw new Error(result.message) ;
         }).then(function( data ) {
             console.log(data) ;
             self._input_name.value = '' ;
@@ -324,7 +333,6 @@ class FilmLoader extends FilmHelper{
             self._input_actors.value = '' ;
             self.props.onAddedFilm() ;
         }, function (err) {
-            console.log('error') ;
             self.props.onMessage(err.message) ;
             console.log(err.message) ;
         });
