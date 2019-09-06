@@ -57,7 +57,6 @@ var sequelize = new Sequelize(config.database.database, config.database.username
 sequelize.import('app/dbmodels') ;
 
 global.config = config ;
-global.logger = logger ;
 
 console.log('Server starting...') ;
 var app = express();
